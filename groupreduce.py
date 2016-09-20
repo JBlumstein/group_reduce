@@ -122,6 +122,7 @@ class GroupCluster(Group):
         self.group_list = [group.name]
         self.df = group.group_df
         self.distance_from_group_addresses = []
+        self.centroid_movement = 0
         group.in_cluster = True
         GroupCluster.group_clusters.append(self)
         GroupCluster.group_cluster_names.append(self.group_list)
@@ -142,6 +143,7 @@ class GroupCluster(Group):
     #create df for all albums in at least one group in cluster
     def add_group_to_cluster (self, other_group):
         self.group_list.append(other_group.name)
+        self.create_group_df()
 
     #get distances from cluster centroids to group centroids
     def get_distances_from_group_addresses (self, all_groups):
