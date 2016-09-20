@@ -129,7 +129,7 @@ class GroupCluster(Group):
         self.get_distances_from_group_addresses(Group.groups)        
 
     #Inherited methods:
-    #find_group_address -> params: self.group_df, returns self.group_address 
+    #find_group_address -> params: self, returns group address 
     #get_distance_betweeen_addresses -> params: 2 groups, returns euclidean distance between groups
 
     #create df for all albums in at least one group in cluster
