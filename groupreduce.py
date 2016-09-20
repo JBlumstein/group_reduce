@@ -122,7 +122,7 @@ class GroupCluster(Group):
         self.group_list = [group.name]
         self.df = group.group_df
         self.distance_from_group_addresses = []
-        self.centroid_movement = 0
+        self.inertia = 0
         group.in_cluster = True
         GroupCluster.group_clusters.append(self)
         GroupCluster.group_cluster_names.append(self.group_list)
