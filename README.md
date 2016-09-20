@@ -8,7 +8,7 @@
 <li>Designate seed</li>
 <li>Find groups with centroids furthest from seed (and each other)</li>
 <li>Create a dataframe for each seed, with rows where df[seed]==1</li>
-<li>Iteratively find group with centroid closest to a cluster and integrate it into the cluster by creating a dataframe where df[seed]==1 or df[integrated_group]==1</li>
+<li>Iteratively find group with centroid closest to a cluster and integrate it into the cluster by creating a dataframe where df[seed]==1 or df[groups_already_integrated_into_cluster]==1 or df[integrated_group]==1</li>
 </ol>
 
 <p>Library dependencies: Pandas, Random</p>
