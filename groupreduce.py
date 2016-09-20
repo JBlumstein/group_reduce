@@ -6,11 +6,11 @@ import random
 
 #-------------------------------------------
 #main function
-def k_means(df,k):
+def k_means(df,n_clusters=8):
     load_in(df)
     get_groups(df)
     get_seed(df)
-    add_clusters(GroupCluster.group_clusters, k, df)
+    add_clusters(GroupCluster.group_clusters, n_clusters, df)
     while len([x for x in Group.groups if x.in_cluster==False]) > 0:
         add_closest_group_to_cluster(GroupCluster.group_clusters)
         
@@ -36,9 +36,9 @@ def get_seed (df):
 
 #method to add k additional clusters by finding group furthest
 #from existing cluster groups
-def add_clusters (clusters, k, df):
+def add_clusters (clusters, n_clusters, df):
     counter = len(clusters)
-    while counter < k:
+    while counter < n_clusters:
         get_furthest_from_clusters(clusters, df)
         counter = counter + 1
 
