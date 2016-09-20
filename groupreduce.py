@@ -1,8 +1,10 @@
-# -*- coding: utf-8 -*-
+#-------------------------------------------
+#import libraries
 import pandas as pd
 import random
 
 
+#-------------------------------------------
 #main function
 def k_means(df,k):
     load_in(df)
@@ -12,25 +14,25 @@ def k_means(df,k):
     while len([x for x in Group.groups if x.in_cluster==False]) > 0:
         add_closest_group_to_cluster(GroupCluster.group_clusters)
         
+        
+#-------------------------------------------
+#top level functions
 
 #load in, rename source dataframe as df
 def load_in (df):
     df = df
     return df
-    
 
 #get groups
 def get_groups (df):
     for c in df.columns:
         Group(c,df)
         
-        
 #get seed
 def get_seed (df):
     seed_number = random.randint(1,len(df.columns))
     seed = Group.groups[seed_number]
     GroupCluster(seed,df)
-
 
 #method to add k additional clusters by finding group furthest
 #from existing cluster groups
@@ -39,7 +41,6 @@ def add_clusters (clusters, k, df):
     while counter < k:
         get_furthest_from_clusters(clusters, df)
         counter = counter + 1
-
 
 #helper method for add_clusters function
 #for computation of furthest distance and assignment of a new cluster
@@ -55,7 +56,6 @@ def get_furthest_from_clusters (clusters, df):
     maxDistanceGroup = maxDistanceItem['group']
     GroupCluster(maxDistanceGroup, df)
 
-
 #function to add the closest group to a cluster to that cluster
 #also finds new closest groups to other clusters
 def add_closest_group_to_cluster (clusters):
@@ -65,13 +65,14 @@ def add_closest_group_to_cluster (clusters):
     for cluster in clusters:
         GroupCluster.get_distances_from_group_addresses(cluster,Group.groups)
 
-
-#helper method to find cluster with closest unassigned group
+#helper method for add_closest_group_to_cluster
+#finds cluster with closest unassigned group
 def get_cluster_with_closest_unassigned_group (clusters):
     cluster_with_closest_unassigned_group = min(clusters, key=lambda x:x.closest_group['distance'])
     return cluster_with_closest_unassigned_group
     
-
+    
+#-------------------------------------------
 #class for each group
 class Group():
     
@@ -110,6 +111,7 @@ class Group():
         other_group.in_cluster = True
 
 
+#-------------------------------------------
 #class for each cluster of groups   
 class GroupCluster(Group):
         
@@ -127,8 +129,8 @@ class GroupCluster(Group):
         self.get_distances_from_group_addresses(Group.groups)        
 
     #Inherited methods:
-    #find_group_address -> requires self.group_df, returns self.group_address 
-    #get_distance_betweeen_addresses -> requires 2 groups, returns euclidean distance between groups
+    #find_group_address -> params: self.group_df, returns self.group_address 
+    #get_distance_betweeen_addresses -> params: 2 groups, returns euclidean distance between groups
 
     #create df for all albums in at least one group in cluster
     #overloaded method, different method needed for evaluation
