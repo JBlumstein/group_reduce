@@ -18,7 +18,7 @@
 <ul>
 <li><strong>df</strong>: dataframe used in analysis</li>
 <li><strong>n_clusters</strong>: number of clusters returned</li>
-<li><strong>df</strong>: number of iterations of k-means performed</li>
+<li><strong>n_iter</strong>: number of iterations of k-means performed</li>
 </ul>
 
 <h4>Returned Values:</h4>
