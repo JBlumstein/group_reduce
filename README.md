@@ -3,6 +3,8 @@
 
 <p>Group Reduce is designed for data sets where instances have multiple group membership (where many rows have more than one cell with a value of 1).</p>
 
+<p>This repo includes the algorithm, a sample dataset, and a sample notebook.</p>
+
 <h4>Basic steps in Group Reduce algorithm:</h4>
 <ol>
 <li>Designate seed randomly</li>
