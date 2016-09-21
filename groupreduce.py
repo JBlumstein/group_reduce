@@ -1,22 +1,40 @@
 #-------------------------------------------
 #import libraries
+
 import pandas as pd
 import random
 
 
 #-------------------------------------------
 #main function
-def k_means(df,n_clusters=8):
+
+def k_means(df,n_clusters=8,n_iter=10):
+    all_results = []
     load_in(df)
     get_groups(df)
-    get_seed(df)
-    add_clusters(GroupCluster.group_clusters, n_clusters, df)
-    while len([x for x in Group.groups if x.in_cluster==False]) > 0:
-        add_closest_group_to_cluster(GroupCluster.group_clusters)
-        
-        
+    while len(all_results) < n_iter:
+        iter_results = perform_k_means(df,n_clusters)
+        all_results.append(iter_results)
+        for group in Group.groups:
+            Group.lower_flag(group)
+    best_result = min(all_results, key=lambda x:x['inertia'])
+    output = {'best_result': best_result, 'all_results': all_results}
+    return output
+
+
 #-------------------------------------------
 #top level functions
+
+#function for performing one iteration of k-means
+def perform_k_means(df,n_clusters):
+    group_clusters = get_seed(df)
+    group_clusters = add_clusters(group_clusters, n_clusters, df)
+    while len([x for x in Group.groups if x.in_cluster==False]) > 0:
+        add_closest_group_to_cluster(group_clusters)
+    group_cluster_names = [x.group_list for x in group_clusters]
+    total_inertia = sum([group_cluster.inertia for group_cluster in group_clusters])
+    clusters_and_inertia = {'groupings': group_cluster_names, 'inertia': total_inertia}
+    return clusters_and_inertia
 
 #load in, rename source dataframe as df
 def load_in (df):
@@ -30,17 +48,20 @@ def get_groups (df):
         
 #get seed
 def get_seed (df):
+    group_clusters = []
     seed_number = random.randint(1,len(df.columns))
     seed = Group.groups[seed_number]
-    GroupCluster(seed,df)
+    seed_cluster = GroupCluster(seed,df)
+    group_clusters.append(seed_cluster)
+    return group_clusters
 
 #method to add k additional clusters by finding group furthest
 #from existing cluster groups
 def add_clusters (clusters, n_clusters, df):
-    counter = len(clusters)
-    while counter < n_clusters:
-        get_furthest_from_clusters(clusters, df)
-        counter = counter + 1
+    while len(clusters) < n_clusters:
+        new_cluster = get_furthest_from_clusters(clusters, df)
+        clusters.append(new_cluster)
+    return clusters
 
 #helper method for add_clusters function
 #for computation of furthest distance and assignment of a new cluster
@@ -54,7 +75,8 @@ def get_furthest_from_clusters (clusters, df):
         distances.append(sum_pair_distances)
     maxDistanceItem = max(distances, key=lambda x:x['distance'])
     maxDistanceGroup = maxDistanceItem['group']
-    GroupCluster(maxDistanceGroup, df)
+    new_cluster = GroupCluster(maxDistanceGroup, df)
+    return new_cluster
 
 #function to add the closest group to a cluster to that cluster
 #also finds new closest groups to other clusters
@@ -74,6 +96,7 @@ def get_cluster_with_closest_unassigned_group (clusters):
     
 #-------------------------------------------
 #class for each group
+    
 class Group():
     
     groups = []
@@ -107,25 +130,26 @@ class Group():
         return distance_between_addresses
     
     #mark group as in a cluster
-    def raise_flag(other_group):
-        other_group.in_cluster = True
+    def raise_flag(group):
+        group.in_cluster = True
+        
+    #reset flag
+    def lower_flag(group):
+        group.in_cluster = False
 
 
 #-------------------------------------------
-#class for each cluster of groups   
+#class for each cluster of groups
+   
 class GroupCluster(Group):
         
-    group_clusters = []
-    group_cluster_names = []
-    
     def __init__(self, group, df: pd.DataFrame()):
-        self.group_list = [group.name]
-        self.df = group.group_df
+        self.groups = [group]
+        self.df = df
         self.distance_from_group_addresses = []
         self.inertia = 0
         group.in_cluster = True
-        GroupCluster.group_clusters.append(self)
-        GroupCluster.group_cluster_names.append(self.group_list)
+        self.get_group_list()
         self.create_group_df()
         self.get_distances_from_group_addresses(Group.groups)        
 
@@ -135,14 +159,19 @@ class GroupCluster(Group):
 
     #create df for all albums in at least one group in cluster
     #overloaded method, different method needed for evaluation
+
+    def get_group_list(self):
+        self.group_list = [x.name for x in self.groups]
+
     def create_group_df(self):
         self.group_df = self.df[self.df[self.group_list].sum(axis=1)>=1]
         self.find_group_address()
-        return self.group_df, self.group_list
+        return self.group_df, self.group_list, self.groups
 
     #create df for all albums in at least one group in cluster
     def add_group_to_cluster (self, other_group):
         self.group_list.append(other_group.name)
+        self.groups.append(other_group)
         self.create_group_df()
 
     #get distances from cluster centroids to group centroids
@@ -151,6 +180,7 @@ class GroupCluster(Group):
             distance = self.get_distance_between_addresses(group)
             group_info = {'group': group, 'name': group.name, 'distance': distance}            
             self.distance_from_group_addresses.append(group_info)
+        self.calculate_inertia()
         #if any unassigned groups, call find_closest_unassigned_group method
         if len([x for x in Group.groups if x.in_cluster==False]) > 0:
             self.find_closest_unassigned_group()
@@ -158,4 +188,8 @@ class GroupCluster(Group):
     #find group not already in a cluster with closest centroid
     def find_closest_unassigned_group (self):
         unassigned_groups = [x for x in self.distance_from_group_addresses if x['group'].in_cluster==False]
-        self.closest_group = min(unassigned_groups, key=lambda x:x['distance']) 
+        self.closest_group = min(unassigned_groups, key=lambda x:x['distance'])
+    
+    #calculate inertia for one cluster
+    def calculate_inertia (self):
+        self.inertia = sum([self.get_distance_between_addresses(group) for group in self.groups])
