@@ -5,10 +5,22 @@
 
 <p>Basic steps in Group Reduce algorithm:</p>
 <ol>
-<li>Designate seed</li>
+<li>Designate seed randomly</li>
 <li>Find groups with centroids furthest from seed (and each other)</li>
 <li>Create a dataframe for each seed, with rows where df[seed]==1</li>
 <li>Iteratively find group with centroid closest to a cluster and integrate it into the cluster by creating a dataframe where df[seed]==1 or df[groups_already_integrated_into_cluster]==1 or df[integrated_group]==1</li>
 </ol>
+
+<p>Function: k_means (df, n_clusters (optional, default = 8), n_iter (optional, default = 10))
+
+<h5>Parameters:</h5>
+<li>
+<ul><strong>df</strong>: dataframe used in analysis</ul>
+<ul><strong>n_clusters</strong>: number of clusters returned</ul>
+<ul><strong>df</strong>: number of iterations of k-means performed</ul>
+</li>
+
+<h5>Returned Values</h5>
+<p>The k-means function returns one variable, a dictionary with two keys, 'best_result' and 'all_results'. The 'best_result' key holds the groupings created with the iteration of the clustering algorithm that had lowest centroid movement and the associated centroid movement (inertia). The 'all_result' key holds a list of [groupings,inertia] created through the algorithm.</p>
 
 <p>Library dependencies: Pandas, Random</p>
