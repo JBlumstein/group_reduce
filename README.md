@@ -1,5 +1,5 @@
 <h1> Group Reduce</h1>
-<p>Group Reduce is a k-means clustering algorithm for reducing the number of groups in a data set. It takes in pandas dataframes with solely categorical data in 0/1 form, and outputs lists of groups close to one another based on based on k-means clustering.</p>
+<p>Group Reduce is a k-means clustering algorithm for reducing the number of groups in a data set (i.e., for clustering groups). It takes in pandas dataframes with solely categorical data in 0/1 form, and outputs lists of groups close to one another based on based on k-means clustering.</p>
 
 <p>Group Reduce is designed for data sets where instances have multiple group membership (where many rows have more than one cell with a value of 1).</p>
 
