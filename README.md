@@ -5,6 +5,13 @@
 
 <p>This repo includes the algorithm, a sample dataset, and a sample notebook.</p>
 
+<h4>Why I decided to build this:</h4>
+<p>Most k-means clustering algorithms, like the one provided by scikitlearn, simply find the midpoint between n centroids in a cluster. When clustering individual instances, this method makes perfect senes. But there are two problems with this method when trying to cluster <i>groups</i>: 1) groups can have different populations, and 2) groups can have overlapping membership. Group Reduce mitigates these issues by doing the following.</p>
+<ol>
+<li>In order to deal with some groups have greater population than others, Group Reduce weights the averaging used in finding a cluster's centroid by the population of each group.</li>
+<li>In order to deal with groups with overlapping membership, when groups are combined into one cluster, the combined data set preserves an instance with membership in multiple groups in the cluster as having a count of one, instead of counting it n times (once for each group in the cluster it's a member of).</li>
+</ol>
+
 <h4>Basic steps in Group Reduce algorithm:</h4>
 <ol>
 <li>Designate seed randomly</li>
