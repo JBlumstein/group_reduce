@@ -81,7 +81,7 @@ def add_closest_group_to_cluster(clusters, df):
     '''function to add the closest group to a cluster to that cluster,
     also finds new closest groups to other clusters'''
     target_cluster = get_cluster_with_closest_unassigned_group(clusters)
-    GroupCluster.add_group_to_cluster(target_cluster,target_cluster.closest_group['group'],df)
+    GroupCluster.add_group_to_cluster(target_cluster, target_cluster.closest_group['group'], df)
     for cluster in clusters:
         GroupCluster.get_distances_from_group_addresses(cluster, Group.groups)
 
@@ -159,14 +159,15 @@ class GroupCluster(Group):
 
     def create_group_df(self, df):
         '''create df for all albums in at least one group in cluster
-        overloaded method, different method needed for evaluation'''
+        overloaded method, in Group takes string, here takes list
+        evaluation approach changes to reflect input'''
         self.group_df = df[df[self.group_list].sum(axis=1)>=1]
         self.find_group_address()
 
     def add_group_to_cluster(self, group, df):
         '''create df for all albums in at least one group in cluster'''
+        self.groups.append(group)        
         self.group_list.append(group.name)
-        self.groups.append(group)
         Group.raise_flag(group)
         self.create_group_df(df)
 
