@@ -14,7 +14,6 @@ def k_means(df, n_clusters=8, n_iter=10):
     get_groups(df)
     n_iter = min(n_iter,len(Group.groups))
     while len(all_results) < n_iter:
-        print(len(all_results)+1)
         iter_results = perform_k_means(df,n_clusters)
         all_results.append(iter_results)
         for group in Group.groups:
