@@ -12,7 +12,9 @@ def k_means(df, n_clusters=8, n_iter=10):
     all_results = []
     load_in(df)
     get_groups(df)
+    n_iter = min(n_iter,len(Group.groups))
     while len(all_results) < n_iter:
+        print(len(all_results)+1)
         iter_results = perform_k_means(df,n_clusters)
         all_results.append(iter_results)
         for group in Group.groups:
@@ -26,7 +28,7 @@ def k_means(df, n_clusters=8, n_iter=10):
 
 def perform_k_means(df, n_clusters):
     '''function for performing one iteration of k-means'''
-    group_clusters = get_seed(df)
+    group_clusters = create_first_cluster(df)
     group_clusters = add_clusters(group_clusters, n_clusters, df)
     while len([x for x in Group.groups if x.in_cluster==False]) > 0:
         add_closest_group_to_cluster(group_clusters,df)
@@ -45,14 +47,30 @@ def get_groups(df):
     for c in df.columns:
         Group(c,df)
         
-def get_seed(df):
-    '''get seed'''
+def create_first_cluster(df):
+    '''get first cluster
+    first cluster should be a group that has not been first cluster in
+    prior iterations    
+    '''
     group_clusters = []
-    seed_number = random.randint(0, len(df.columns)-1)
-    seed = Group.groups[seed_number]
+    seed = get_seed(df)
+    Group.now_has_been_seed(seed)
     seed_cluster = GroupCluster(seed,df)
     group_clusters.append(seed_cluster)
     return group_clusters
+
+def get_seed(df):
+    '''get a seed group to be first cluster for one iteration
+    works by picking a seed number, checking if group has been seed:
+    - if group hasn't been seed, set that group as seed for iteration
+    - if group has been seed, use recursion to return to top of function
+    '''
+    seed_number = random.randint(0, len(df.columns)-1)
+    if Group.groups[seed_number].has_been_seed == False:
+        seed = Group.groups[seed_number]
+        return seed
+    else:
+        return get_seed(df)
 
 def add_clusters(clusters, n_clusters, df):
     '''function to add k additional clusters by finding group furthest
@@ -104,6 +122,7 @@ class Group():
         '''init method'''
         self.name = name
         self.in_cluster = False
+        self.has_been_seed = False
         Group.groups.append(self)
         Group.group_names.append(self.name)
         self.create_group_df(df)
@@ -132,6 +151,10 @@ class Group():
     def lower_flag(group):
         '''reset flag'''
         group.in_cluster = False
+    
+    def now_has_been_seed(group):
+        '''mark that a group has been seed'''
+        group.has_been_seed = True
 
 #-------------------------------------------
 #class for each cluster of groups
