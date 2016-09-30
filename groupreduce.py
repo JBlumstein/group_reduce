@@ -62,7 +62,7 @@ def get_seed(df):
     '''get a seed group to be first cluster for one iteration
     works by picking a seed number, checking if group has been seed:
     - if group hasn't been seed, set that group as seed for iteration
-    - if group has been seed, use recursion to return to top of function
+    - if group has been seed, recursively return to top of function
     '''
     seed_number = random.randint(0, len(df.columns)-1)
     if Group.groups[seed_number].has_been_seed == False:
@@ -72,7 +72,7 @@ def get_seed(df):
         return get_seed(df)
 
 def add_clusters(clusters, n_clusters, df):
-    '''function to add k additional clusters by finding group furthest
+    '''function to add additional clusters by finding group furthest
     from existing cluster groups'''
     while len(clusters) < n_clusters:
         new_cluster = get_furthest_from_clusters(clusters, df)
