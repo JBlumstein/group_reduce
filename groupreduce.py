@@ -171,7 +171,7 @@ class GroupCluster(Group):
         self.distance_from_group_addresses = []
         self.inertia = 0
         Group.raise_flag(group)
-        self.create_group_list()
+        self.create_group_list()        
         self.create_group_df(df)
         self.get_distances_from_group_addresses(Group.groups)        
 
