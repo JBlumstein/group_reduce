@@ -54,7 +54,7 @@ def create_first_cluster(df):
     group_clusters = []
     seed = get_seed(df)
     Group.now_has_been_seed(seed)
-    seed_cluster = GroupCluster(seed,df)
+    seed_cluster = GroupCluster(seed, df)
     group_clusters.append(seed_cluster)
     return group_clusters
 
@@ -96,11 +96,12 @@ def get_furthest_from_clusters(clusters, df):
 
 def add_closest_group_to_cluster(clusters, df):
     '''function to add the closest group to a cluster to that cluster,
-    also finds new closest groups to other clusters'''
+    also finds new closest groups to other clusters whose previous closest group is now in a cluster'''
     target_cluster = get_cluster_with_closest_unassigned_group(clusters)
     GroupCluster.add_group_to_cluster(target_cluster, target_cluster.closest_group['group'], df)
     for cluster in clusters:
-        GroupCluster.get_distances_from_group_addresses(cluster, Group.groups)
+        if cluster.closest_group['group'].in_cluster==True:
+            GroupCluster.find_closest_unassigned_group(cluster)
 
 def get_cluster_with_closest_unassigned_group(clusters):
     '''helper function for add_closest_group_to_cluster function
@@ -161,53 +162,55 @@ class Group():
 class GroupCluster(Group):
     '''class for each cluster of groups
     Inherited methods that are used:
-    1) find_group_address -> params: self, returns group address 
-    2) get_distance_betweeen_addresses -> params: 2 groups, returns euclidean distance between groups
+    1) find_group_address -> params: self; returns group address 
+    2) get_distance_betweeen_addresses -> params: 2 groups; returns euclidean distance between groups
     '''
         
     def __init__(self, group, df: pd.DataFrame()):
         '''init method'''
         self.groups = [group]
-        self.distance_from_group_addresses = []
+        self.distances_from_group_addresses = []
         self.inertia = 0
         Group.raise_flag(group)
-        self.create_group_list()        
-        self.create_group_df(df)
-        self.get_distances_from_group_addresses(Group.groups)        
-
-    def create_group_list(self):
-        '''assign self.group_list as the names from each group in cluster'''
-        self.group_list = [x.name for x in self.groups]
-
-    def create_group_df(self, df):
-        '''create df for all albums in at least one group in cluster
-        overloaded method, in Group takes string, here takes list
-        evaluation approach changes to reflect input'''
-        self.group_df = df[df[self.group_list].sum(axis=1)>=1]
-        self.find_group_address()
+        self.set_cluster_attributes(df)
 
     def add_group_to_cluster(self, group, df):
-        '''create df for all albums in at least one group in cluster'''
-        self.groups.append(group)        
-        self.group_list.append(group.name)
+        '''special methods for when a group is added to cluster:
+        add a group to self.groups
+        raise flag on group added to cluster
+        reset attributes in set_group_attributes
+        calculate_intertia = sum of distances from centroid of cluster to
+        group centroids
+        '''
+        self.groups.append(group)
         Group.raise_flag(group)
-        self.create_group_df(df)
+        self.set_cluster_attributes(df)
+        self.calculate_inertia()        
+
+    def set_cluster_attributes(self, df):
+        '''common methods for when a cluster is initiated or added to:
+        group_list = the names from each group in cluster
+        group_df = df of albums in cluster
+        group_address (inherited) = centroid for cluster
+        '''
+        self.group_list = [x.name for x in self.groups]
+        self.group_df = df[df[self.group_list].sum(axis=1)>=1]
+        self.find_group_address()
+        self.get_distances_from_group_addresses(Group.groups) 
 
     def get_distances_from_group_addresses(self, all_groups):
         '''get distances from cluster centroids to group centroids'''
         for group in all_groups:
             distance = self.get_distance_between_addresses(group)
             group_info = {'group': group, 'name': group.name, 'distance': distance}            
-            self.distance_from_group_addresses.append(group_info)
-        self.calculate_inertia()
-        #if any unassigned groups, call find_closest_unassigned_group method
-        if len([x for x in Group.groups if x.in_cluster==False]) > 0:
-            self.find_closest_unassigned_group()
+            self.distances_from_group_addresses.append(group_info)
+        self.find_closest_unassigned_group()
 
     def find_closest_unassigned_group(self):
-        '''find group not already in a cluster with closest centroid'''
-        unassigned_groups = [x for x in self.distance_from_group_addresses if x['group'].in_cluster==False]
-        self.closest_group = min(unassigned_groups, key=lambda x:x['distance'])
+        '''if any unassigned groups, find group not already in a cluster with closest centroid'''
+        if len([x for x in Group.groups if x.in_cluster==False]) > 0:
+            unassigned_groups = [x for x in self.distances_from_group_addresses if x['group'].in_cluster==False]
+            self.closest_group = min(unassigned_groups, key=lambda x:x['distance'])
     
     def calculate_inertia(self):
         '''calculate inertia for one cluster'''
