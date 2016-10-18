@@ -10,7 +10,6 @@ import random
 def k_means(df, n_clusters=8, n_iter=10):
     '''main function'''
     all_results = []
-    load_in(df)
     get_groups(df)
     n_iter = min(n_iter,len(Group.groups))
     while len(all_results) < n_iter:
@@ -35,11 +34,6 @@ def perform_k_means(df, n_clusters):
     total_inertia = sum([group_cluster.inertia for group_cluster in group_clusters])
     clusters_and_inertia = {'groupings': group_cluster_names, 'inertia': total_inertia}
     return clusters_and_inertia
-
-def load_in(df):
-    '''load in, rename source dataframe as df'''
-    df = df
-    return df
 
 def get_groups(df):
     '''get groups'''
