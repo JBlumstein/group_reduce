@@ -1,7 +1,7 @@
 <h1> Group Reduce</h1>
 <p>Group Reduce is a k-means clustering algorithm for reducing the number of groups in a data set (i.e., for clustering groups). It takes in pandas dataframes categorical data in 0/1 form, and outputs lists of groups close to one another based on based on k-means clustering. Group Reduce is designed for data sets where instances have multiple group membership.</p>
 
-<p>Most k-means clustering algorithms, when adding to a cluster, simply find the midpoint between the n points in the cluster (i.e., they find the point in a space that is the smallest summed euclidean distance between the points). When clustering individual instances, this method makes perfect sense.</p>
+<p>A naive k-means clustering algorithms, when adding to a cluster, simply finds the midpoint between the n points in the cluster (i.e., it finds the point in a space that is the smallest summed euclidean distance between the points). When clustering individual instances, this method makes perfect sense.</p>
 
 <p>However, when trying to cluster groups, it must be taken into account that groups can have different size populations and that group memberships can overlap. As a result, instead of finding the minimum sum of unweighted euclidean distances from points represented by each group (one point per group), when clustering groups the search for a centroid can be done more effectively by finding the minimum sum of unweighted euclidean distances of the union of the populations of the groups in the cluster. This is exactly how Group Reduce works.</p>
 
