@@ -1,16 +1,13 @@
 <h1> Group Reduce</h1>
-<p>Group Reduce is a k-means clustering algorithm for reducing the number of groups in a data set (i.e., for clustering groups). It takes in pandas dataframes with solely categorical data in 0/1 form, and outputs lists of groups close to one another based on based on k-means clustering.</p>
+<p>Group Reduce is a k-means clustering algorithm for reducing the number of groups in a data set (i.e., for clustering groups). It takes in pandas dataframes categorical data in 0/1 form, and outputs lists of groups close to one another based on based on k-means clustering. Group Reduce is designed for data sets where instances have multiple group membership.</p>
 
-<p>Group Reduce is designed for data sets where instances have multiple group membership (where many rows have more than one cell with a value of 1).</p>
+<p>Most k-means clustering algorithms, when adding to a cluster, simply find the midpoint between the n points in the cluster (i.e., they find the point in a space that is the smallest summed euclidean distance between the points). When clustering individual instances, this method makes perfect sense.</p>
 
-<p>This repo includes the algorithm, a sample dataset, and a sample notebook.</p>
+<p>However, when trying to cluster groups, it must be taken into account that groups can have different size populations and that group memberships can overlap. As a result, instead of finding the minimum sum of unweighted euclidean distances from points represented by each group (one point per group), when clustering groups the search for a centroid can be done more effectively by finding the minimum sum of unweighted euclidean distances of the union of the populations of the groups in the cluster. This is exactly how Group Reduce works.</p>
 
-<h4>Why I decided to build this:</h4>
-<p>Most k-means clustering algorithms, like the one provided by scikitlearn, simply find the midpoint between n centroids in a cluster. When clustering individual instances, this method makes perfect senes. But there are two problems with this method when trying to cluster <i>groups</i>: 1) groups can have different size populations, and 2) groups can have overlapping membership. Group Reduce mitigates these issues by doing the following.</p>
-<ol>
-<li>In order to deal with some groups have greater population than others, Group Reduce weights the averaging used in finding a cluster's centroid by the population of each group.</li>
-<li>In order to deal with groups with overlapping membership, when groups are combined into one cluster, the combined data set preserves an instance with membership in multiple groups in the cluster as having a count of one, instead of counting it n times (once for each group in the cluster it's a member of).</li>
-</ol>
+<p>For example, let's say cluster D includes groups A, B, and C, and that group A includes the set of points (K, J, M), group B includes the set of points (M, N, P, Q, X, Y), and group C includes the set of points (X, Y, Z). Here Group Reduce will find the union of the groups' memberships--the set of points (K, J, M, N, P, Q, X, Y, Z)--and then the minimum sum of unweighted euclidean distances from this newly created set representing the members of the cluster.</p>
+
+<p>While Group Reduce is by no means the most efficient or cleanly coded algorithm ever created, it works as advertised. I'm hoping in to continue working on Group Reduce to make it more flexible and resilient.</p>
 
 <h4>Basic steps in Group Reduce algorithm:</h4>
 <ol>
