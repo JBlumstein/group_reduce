@@ -1,6 +1,6 @@
 <h1> Group Reduce</h1>
 
-<p>Check out the groupreduce.py for the algorithm and the jupyter notebook for an example of the groupreduce algorithm in action.
+<p>Check out the <a href="https://github.com/JBlumstein/group_reduce/blob/master/groupreduce.py">groupreduce.py python file</a> for the algorithm and the <a href="https://github.com/JBlumstein/group_reduce/blob/master/test_notebook.ipynb">jupyter notebook</a> for an example of the groupreduce algorithm in action.
 
 <hr>
 
